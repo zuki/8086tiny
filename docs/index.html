@@ -1,0 +1,372 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>8086tiny: a tiny PC emulator/virtual machine - Documentation</title>
+<meta name="keywords" content="8086tiny free small portable 8086 pc emulator" />
+<meta name="description" content="8086tiny is a free, open source PC XT-compatible emulator/virtual machine written in C. It is, we believe, the smallest of its kind." />
+<link href="8086tiny.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<!--
+This is a free CSS template provided by templatemo.com
+-->
+<div id="templatemo_container_wrapper">
+	<div class="templatemo_spacer"></div>
+<div id="templatemo_container">
+<div id="templatemo_top">
+<b>8086tiny</b> · Documentation
+</div>
+  <div id="templatemo_header">
+        <img src="images/logo.gif" width=780 align=middle>
+  </div>
+
+<div id="templatemo_left_column">
+<div class="text_area" align="justify">
+
+<div class="title">解説</div>
+
+<p>
+	8086tinyは小さくフリーでオープンソースのポータブルなIntel PCエミュレータ/VMであり、DOSやWindows 3.0, Excel, MS Flight Simulator, AutoCAD, Lotus 1-2-3などのアプリケーションを実行できるパワーを持っています。8086tinyは、次の機能を備えた「80年代後半の」PC XTタイプのマシンをエミュレートします。
+	</p>
+
+<ul>
+<li>Intel 8086/186 CPU</li>
+<li>1MB RAM</li>
+<li>3.5" フロッピーディスクコントローラ (1.44MB/720KB)</li>
+<li>固定ディスクコントローラ (最大520MBのハードディスクを1台サポート)</li>
+<li>720x348 2色および320x200 4色グラフィックス（64KBビデオRAM)、CGA 80 x 25 16色テキストモードをサポートするCGA/Herculesグラフィックカード</li>
+<li>正確なプログラマブル割り込みタイマー (PIT)</li>
+<li>83キーXTキーボードのキーボードコントローラstyle keyboard</li>
+<li>リアルタイムクロック</li>
+<li>PCスピーカー</li>
+</ul>
+
+<p>このエミュレータはポータビリティを図るためにSDLグラフィックライブラリを使用し、様々なプラットフォーム（Windows, Mac OS X, Linux, Android, iOS, Raspberry Pi）でコンパイルできます。</p>
+<p>提供している8086tinyは8086命令セットしか実装していませんが、より複雑で現代的な命令セットにも比較的容易に拡張できます。</p>
+
+  <div class="section_box2" align="justify">
+	        <div class="post_title">ビルド方法</div>
+        	<div class="text_area">
+            <p>
+							8086tinyディストリビューションには、ほとんどのUNIXプラットフォームで変更なしにコンパイルできるMakefileが含まれています。8086tinyのソースコードはMicrosoft Visual Studio C/C++でも変更なしにコンパイルできます。
+              </p>
+            <ul>
+              <li>Running <code>make</code>を実行すると、8086tinyディストリビューション全体がコンパイルされます。これにはSDLによるオーディオとCGA/Herculesグラフィックスのサポートが含まれます。</li>
+              <li>（Raspberry Piなどの）低速なプラットフォームでは、グラフィックスエミュレーションフレームレートを上げるために<code>make 8086tiny_slowcpu</code>でビルドします。</li>
+              <li>使用のプラットフォームにSDLがない、または、グラフィックモードやオーディオが必要ない場合は、<code>make no_graphics</code>を実行することでグラフィックスやオーディオのサポートがない、よりコンパクトなバイナリを作成することができます。</li>
+              </ul>
+        	</div>
+  </div>
+
+  <div class="section_box2" align="justify">
+	        <div class="post_title">使用方法</div>
+        	<div class="text_area">
+            <p><code>8086tiny bios-image-file floppy-image-file [@][harddisk-image-file]</code></p>
+
+            <p><code>harddisk-image-file</code>の頭に<code>@</code>を付けると8086tinyはハードディスクから起動します。それ以外はフロッピーディスクイメージから起動します。</p>
+
+            <p>UNIXでは、<b>エミュレータを実行するために<code>stty</code>コマンドを使ってキーボードをrawモードする必要があります</b>。ディストリビューションには、キーボードモードを適切に設定し、フロッピーディスクまたはハードディスクからエミュレータを実行する<code>runme</code>という名のスクリプトが含まれています。</p>
+            <code>
+              #!/bin/sh<br>
+              clear<br>
+              stty cbreak raw -echo min 0<br>
+              if [ -f hd.img ]<br>
+              then<br>
+              &nbsp;&nbsp;./8086tiny bios fd.img hd.img<br>
+              else<br>
+              &nbsp;&nbsp;./8086tiny bios fd.img<br>
+              fi<br>
+              stty cooked echo
+            </code>
+        	</div>
+  </div>
+
+  <div class="section_box2" align="justify">
+	        <div class="post_title">ハードディスクイメージの作成</div>
+        	<div class="text_area">
+            <p>
+							エミュレータで使用するハードディスクイメージを作成するには、<code>mkfile</code>などのツールを使って、
+							必要なサイズのフラットなファイルをたとえば<code>hd.img</code>という名前で作成し0バイトで埋めます。
+            </p>
+            <p>
+							DOSにおいてエミュレータで使用するハードディスクイメージを用意するには、実際のPCと同じように行います。
+              <ul>
+                <li>エミュレータを起動し、<code>FDISK</code>を使ってハードディスクのパーティションをします。
+									パーティションが終わるとFDISKはエミュレータを再起動します。</li>
+                <li><code>FORMAT C:</code>（ブート可能なディスクを作成する場合は<code>FORMAT C: /S</code>）を実行して、
+									ディスクイメージをフォーマットします。これで終わりです。</li>
+                </ul>
+              <p>出来上がったディスクイメージは、Windows PCでは<code>OSFMount</code>で、Macでは<code>hdiutil</code>で、
+								Linuxでは<code>mount</code>でマウントできるフォーマットであり、ディスクにファイルやプログラムを簡単にコピーできます。
+								また、通常のフロッピーディスクイメージ（以下の「フロッピードライブエミュレーションを参照）を使って、エミュレータの中から
+								プログラムをインストールできます。
+            </p>
+        	</div>
+  </div>
+
+    <div class="section_box2" align="justify">
+	        <div class="post_title">キーボードサポート</div>
+        	<div class="text_area">
+            <p>
+              このエミュレータは、I/Oポート0x60にあるキーが押される度に割り込み9を発生するIntel 8042チップにより制御されるXTスタイルのキーボードをシミュレートします。現実の8042はASCII文字ではなくスキャンコードを返すので、ポータビリティのために、エミュレータのBIOSは現実のPCの
+							BIOSとは逆に、ASCII文字をスキャンコードに変換し、「現実の」キーボートと同じように機能するために必要に応じて修飾キー（シフトキーなど）の押す/放すをシミュレートします。その後、OS(DOS/Windows)はスキャンコードをASCII文字に戻すので、通常、このプロセスはシームレスに行われます。
+            </p><p>
+            <p>
+							BIOSにあるスキャンコード表は手元のキーボードレイアウトをUSレイアウトのQWERTYキーボードに合うよう対応付けます。国際化キーボードを
+							レイアウトを使用している場合、使用しているOS（Windows 3.0など）が提供している「米国83キー・キーボード」などを選択することで、変更なしにすべてがうまく動くはずです。
+            </p><p>
+              コンソール（テキスト）アプリケーションで、Alt+<i>xxx</i>やF<i>xx</i>、Ctrl+<i>xxx</i>といった特別なキーシークエンスがあります。これらは標準CのI/O関数では直接返せないので、次のようにします。
+              </p><ul>
+              <li>Alt+<i>xxx</i>キーコンビネーションを送信するには、Ctrl+Aを押してから、該当のキーを押します。たとえば、Alt+Fを入力するには、まずCtrl+Aを押し、続いてFを押します。</li>
+              <li>F<i>xx</i>キーを送信するには、Ctrl+Fを押してから、数字キーを押します。たとえば、F4を入力するには、まずCtrl+Fを押し、続いて4を押します。F10を入力するには、まずCtrl+Fを押し、続いて0を押します。</li>
+              <li>Ctrl+Aを送信するには、Ctrl+Fを押してから、Ctrl+Aを押します。Ctrl+Fを送信するには、Ctrl+Fを押してから、Ctrl+Fを押します。</li>
+              <li>Page Downキーを送信するには、Ctrl+Fを押してからOを押します。 Page Upキーを送信するには、Ctrl+Fを押してからQを押します。</li>
+              </ul>
+            </p><p>グラフィック（SDL）アプリケーションでは、上のような特別なシークエンスなしに、すべてのキーが「現実の」PCどおりに機能します。
+            </p><p>キーボードは<code>KEYBOARD_TIMER_UPDATE_DELAY</code>命令ごとにポーリングされます。この値を下げるとキーボードの反応は早くなりますが、エミュレートするCPU速度が犠牲になります。逆も同じです。デフォルトの20,000はおとんどのプラットフォームに適しているはずです。 </p>
+        	</div>
+  </div>
+
+      <div class="section_box2" align="justify">
+	        <div class="post_title">フロッピードライブエミュレーション</div>
+        	<div class="text_area">
+            <p>
+              3.5"高密度フロッピードライブをエミュレートします。1.44MBディスク（1トラック18セクタ、2ヘッド）と720KBディスク
+							（1トラック9セクタ、2ヘッド）の読み込み、書き込み、フォーマットが可能です。
+            </p><p>
+							（<a href="http://www.vetusware.com">Vetusware</a>などからダウンロードした）複数枚数のフロッピーイメージからソフトウェアを
+							インストールしたい場合に、「ディスク交換」を行う最も簡単な方法は、8086tinyを実行している端末とは違う端末から、コマンドラインで
+							指定したフロッピーイメージの順番とおりに各ディスクイメージをコピーすることです。最後にオリジナルブートディスクを指定することを
+							忘れないでください。
+            </p>
+        	</div>
+  </div>
+
+    <div class="section_box2" align="justify">
+	        <div class="post_title">Hard Drive Emulation</div>
+        	<div class="text_area">
+            <p>
+              最大1,023シリンダ、1トラック当たり63セクタ、63ヘッダで最大528MBのディスク容量をサポートします。
+            </p><p>
+              使用するディスクイメージフォーマットはほとんどのディスクイメージマウントツールで使用されている標準的な"raw" フォーマットのサブセットです。一般に、このエミュレータで用意されたディスクイメージはディスっくイメージツールや他のエミュレータで動作しますが、それ以外の方法では動作しません。
+            </p><p>
+							このエミュレータは、あまりにも単純なアルゴリズムを使って、ディスクイメージファイルのサイズからシミュレートするシリンダ/セクタ/ヘッダのジオメトリを抽出します。このアルゴリズムにより、通常、イメージファイル内のすべての領域がディスクパーティションとして使えるわけではありません。たとえば、40MBのイメージをファイルを作成しても、DOS FDISKで見るとボリュームサイズは31.98MBにしかなりません。
+            </p><p>
+              8086tinyはコマンドラインのハードディスク指定の際にファイル名の前に<code>@</code>を付けるとハードディスクイメージから起動します。たとえば、<code>./8086tiny bios fd.img @hd.img</code>
+            </p>
+        	</div>
+  </div>
+
+    <div class="section_box2" align="justify">
+	        <div class="post_title">テキストモードのサポート</div>
+        	<div class="text_area">
+            <p>
+							このエミュレータは、標準的なBIOS0x10割り込みインターフェイスを介したテキスト出力をサポートし、また、ダイレクトビデオメモリアクセス（1ページ、セグメントB800の4KBのビデオRAM）による80 x 25のCGA 16色テキストモードをサポートします。
+            </p><p>
+							BIOSのテキスト出力呼び出しは単純なstdoutへの単純な<code>stdout</code>への書き込みに変換されます。 ダイレクトビデオメモリアクセスによる80 x 25のCGAカラーテキストモードは、ANSI端末エスケープシーケンスに変換されます。 ANSIをサポートしていない端末（MS VC++でエミュレータをコンパイルしたり、Windowsのコンソールウィンドウで実行している場合など）を使用している場合は、テキストモードでビデオメモリに直接書き込むPCアプリケーションは使用できない可能性があります。端末ウィンドウのサイズは少なくとも80 x 25であることを確認してください。
+            </p><p>
+							テキストモードのビデオメモリは、<code>8 * KEYBOARD_TIMER_UPDATE_DELAY</code>命令ごとに端末にレンダリングされます。この値を小さくすると、テキストの更新速度は向上しますが、エミュレートされたCPU速度は犠牲になります。逆もまた真です。デフォルト値の20000は、ほとんどのプラットフォームに適しているはずです。
+              </p>
+            </p><p>
+							通常のPC文字コードページ（437）には、線画などのためのさまざまな拡張ASCII文字が含まれています。使用している端末プログラムにこれらを含むフォントに設定したいかもしれません（たとえば、Mac OS Xには、Perfect DOS VGA 437と呼ばれる最適なフリーフォントがあります）。そうしないと、拡張文字が正しく表示されない（たとえば、疑問符記号など）ことがあります。
+            </p><p>
+							時折、DOSアプリケーションがビデオハードウェアをおかしな状態にして終わることがあり、エミュレータを混乱させ、その結果、その後のテキスト出力が見えなくなることがあります。このような場合は、DOS　<code>CLS</code>コマンドを使用して画面をクリアしてください。すべてがうまくいきます。
+            </p>
+        	</div>
+  </div>
+
+    <div class="section_box2" align="justify">
+	        <div class="post_title">グラフィックモードのサポート</div>
+        	<div class="text_area">
+            <p>
+              Hercules 720x348モノクログラフィックスとCGA 320x200 4色グラフィックモードをSDLを使ってエミュレートします。ほとんどのCGA / Hercules機能を、0x3D<i>x</i> と0x3B<i>x</i>ポート上の一般的なI/Oインターフェースを通じてサポートしています。 また、ダブルバッファグラフィックスを使用するユーザのためにビデオメモリバンクの切り替え（セグメントB000/B800）もサポートしてます。たとえば、640x408を使用するETEN中国語システムなどで必要なCRTCレジスタによる解像度再プログラミングは、8086tiny 1.03以降でサポートされています。現在、CGA 640x200の2色モードは現在サポートされていません。
+            </p><p>
+							アプリケーションがグラフィックモードに入ると、エミュレータはSDLウィンドを開きます（アプリケーションがテキストモードに戻ると閉じます）。UNIXでは、DISPLAY環境変数が設定されている場合、SDLは自動的にX11を通じてグラフィックスを出力します。
+            </p><p>
+							グラフィックス表示は、<code>GRAPHICS_UPDATE_DELAY</code>命令ごとに更新されます。この値を小さくすると、グラフィックスの更新速度は向上しますが、エミュレートするCPU速度は犠牲になります。逆もまた真です。<code>GRAPHICS_UPDATE_DELAY</code>命令のデフォルトは360,000に設定されており、高速なプラットフォームでは良好なパフォーマンスが得られます。 Raspberry Piのような低速なプラットフォームでは、より小さな値が適しています。<code>make 8086tiny_slowcpu</code>でビルドした場合、<code>GRAPHICS_UPDATE_DELAY</code>は50,000命令に減らされます。
+            </p><p>
+							（AutoCADなど）アプリケーションの中には、2つのディスプレイにテキストとグラフィックスを同時に出力するために、CGAカードとHerculesカードを両差したPC構成をサポートしています。このエミュレータは、（端末）テキストと（SDL）グラフィックス表示用に別々のウィンドウを使用することでこの構成もシミュレートします。
+            </p><p>
+							アプリケーションがテキストモードのみを必要とする場合は、 <code>NO_GRAPHICS</code>を定義することによりSDLなしに8086tinyをコンパイルできます。
+            </p>
+        	</div>
+  </div>
+
+      <div class="section_box2" align="justify">
+	        <div class="post_title">リアルタイムクロックのサポート</div>
+        	<div class="text_area">
+            <p>
+							RTC（時間と日付）の読み込みは、ホストコンピュータから時間/日付を取り込み、標準的なBIOSクロックインターフェイスを通じてエミュレートします。時間と日付の設定はサポートしていません。
+            </p>
+        	</div>
+  </div>
+
+      <div class="section_box2" align="justify">
+	        <div class="post_title">ハードウェアタイマーのサポート</div>
+        	<div class="text_area">
+            <p>
+							通常のI/Oポート0x40-0x43インターフェースを通じて、プログラマブル割り込みタイマーのチャネル0と2をエミュレートします。現在、サポートしているのはモード3（方形波ジェネレータ）だけですが、ほとんどのアプリケーションが使用しているおはこのモードです。タイマーを使用してゲームなどの実行速度を制御するソフトウェアは、正確なペースで実行する必要があります。
+            </p>
+        	</div>
+  </div>
+
+        <div class="section_box2" align="justify">
+	        <div class="post_title">PCスピーカーのサポート</div>
+        	<div class="text_area">
+            <p>
+							PCスピーカーは通常の0x61ポートインターフェースを通じてエミュレートしています。PCスピーカーでサポートされているモードはPITチャネル2経由のみです。そのため、ほとんどの音楽は聞くことができるでしょうが、非音楽のサウンド効果は聞けないでしょう。
+            </p>
+        	</div>
+  </div>
+
+    <div class="section_box2" align="justify">
+	        <div class="post_title">BIOS</div>
+        	<div class="text_area">
+            <p></p>
+						実際のPC同様に、エミュレータにはブート機能と標準的な割り込みインターフェイスを実装するためのBIOSが必要です。8086tiny BIOSは、パブリックドメインのドキュメントを使用して一から書きました。サイズは約6KBで、NASMでアセンブルしました。完全なソースコードとビルド済みのバイナリが用意されています。
+            <p></p>
+						BIOSバイナリは、コードセクションとデータセクションからなります。コードセクションでは、ビデオ、ディスク、タイマー、時計などの標準的な割り込みインターフェイスを「実際の」PC BIOSと同じように実装しています。また、エミュレータがテキストモードの場合、小さなタイマー制御のビデオドライバを使用してビデオメモリのフォーマットをANSIエスケープシーケンスに変換します。データセクションには、スキャンコードテーブルやBIOSデータエリアのような一般的なBIOS構造体だけでなく、エミュレータの命令解読を支援する多数のルックアップテーブルも含まれています。 以下の「CPU、メモリ、レジスタのエミュレーション」に詳細が記載されています。
+            </p>
+        	</div>
+  </div>
+
+      <div class="section_box2" align="justify">
+	        <div class="post_title">メモリマップとレジスタのエミュレーション</div>
+        	<div class="text_area">
+            <p>
+							エミュレータは、A20アドレス線のラップアラウンドを無効にしたハードウェア構成をシミュレートしており、アプリケーションは1MBをわずかに超えるRAMしか使用できません。
+            </p><p>
+							メモリマップは実際のPCとほとんど同じであり、割り込みベクタテーブルは0：0、BIOSデータ領域は、キーボードバッファが<code>40:0</code>、CGAテキストビデオメモリが<code>B800:0</code>、Hercules / CGAグラフィックメモリが<code>B000</code>/<code>B800:0</code> 、BIOSが<code>F000:0100</code>です。実際のPCとは異なり、エミュレータでは、CPUレジスタはメモリにマップされています（<code>F000:0</code>）。これにより、実行中の僧徒には知られることなく、メモリとレジスタ操作の統一ができ、エミュレータの命令実行ユニットを大幅に最適化することができます。
+            </p>
+        	</div>
+  </div>
+
+  <div class="section_box2" align="justify">
+	        <div class="post_title">CPU、メモリ、レジスタのエミュレーション</div>
+        	<div class="text_area">
+            <p>
+							CPUは、8086命令セットを完全にサポートしています。これには、文書化されていない命令（<code>SALC</code>など）やフラグの動作（<code>MUL</code>/<code>DIV</code>など）、一部のアプリケーションが依存するオペコードのバグ（<code>PUSH SP</code>など）、デバッガをサポートするためのトラップフラグを含みます。
+            </p><p>
+							8086tinyの焦点は、エミュレーションの精度を損なうことなくコードサイズを最小限に抑えることです。きわめて不規則なIntel x86命令フォーマットの複雑さのために、命令のデコードはBIOSバイナリを形成する多くのルックアップテーブルによって支援されます。たとえば、ソースオペランドとデスティネーションオペランドのタイプ（即値、レジスタ、またはメモリ）に応じて、<code>MOV</code>命令をエンコードする方法はさまざまです。場合によっては、同じ命令をエンコードする複数の方法もあります（たとえば、<code>MOV AX, [1234]</code>は通常<code>A1 34 12</code>とエンコードしますが、<code>8B 06 34 12</code>とエンコードすることもできます）。各命令やエンコードバリアントに対してエミュレータが同じ機能を複数回実装しないようにするために、ルックアップテーブルを使用して、各命令を内部関数や副関数の番号にマッピングしています。
+            </p><p>
+							例として、16進数<code>01 D8</code>とエンコードされている命令<code>ADD AX, BX</code>をエミュレータがどのように実行するかを示します。
+              </p>
+              <ul>
+                <li>
+									エミュレータはまず、（命令の最初のバイトである）インデックス<code>01</code>Hを<code>TABLE_XLAT_OPCODE</code>と<code>TABLE_XLAT_SUBFUNCTION</code>で検索し、<i>変換済オペコードID</i>として10進数の9（Intel命令テンプレート<code><i>arithmetic_function</i>レジスタ、r/m</code>に対応）と<i>副関数ID</i>として0（<code>ADD</code>機能に対応）を得ます。</li>
+                <li>
+									ソースの<code>OPCODE</code>チェーンが<i>変換済オペコードID</i>と<i>副関数ID</i>を使用して実行するオペレーションを決定します。この場合、まず<code>OP(+=)</code>マクロを、次に<code>set_CF()</code>を呼び出し、加算の結果に基づきキャリーフラグを設定します。</li>
+                <li>
+									次に、命令長が計算されます。インテルx86命令は任意の長さであり（同じ命令の複数のエンコーディングが異なる長さを持つこともあります）、表を使用して命令長を決定し、IPを次の命令に移行します。オペコードインデックス<code>01</code>Hが、<code>TABLE_BASE_INST_SIZE</code>と<code>TABLE_I_MOD_SIZE</code>、<code>TABLE_I_W_SIZE</code>へのインデックスとして使用され、これらの数値が総命令長を計算するために加算されます。</li>
+                <li>
+									最後に、フラグが設定されます。オペコードインデックス<code>01</code>Hが、<code>TABLE_STD_FLAGS</code>へのインデックスとして使用され、ビットマスクが3になります。これは<code>FLAGS_UPDATE_SZP | FLAGS_UPDATE_AO_ARITH</code>を意味します。
+									</li>
+                <ul>
+									<li>
+										<code>FLAGS_UPDATE_SZP</code>（1）は、この命令が演算の結果に従って標準的な方法で符号とゼロ、パリティの各フラグを設定することを示します。符号フラグとゼロフラグは結果から直接設定され、パリティフラグは<code>TABLE_PARITY_FLAG</code>の結果を参照して設定されます。</li>
+                	<li>
+										<code>FLAGS_UPDATE_AO_ARITH</code>（2）は、この命令が算術演算の基準として補助フラグとオーバーフローフラグを設定することを示します。</li>
+                	<li>
+										<code>FLAGS_UPDATE_OC_LOGIC</i></code>（4）がビットマスクに設定されている場合（この例では設定されていません）、ロジック操作の基準として、オーバーフローフラグとキャリーフラグが0に設定されます。</li>
+								</ul>
+              </ul>
+
+              <p>
+								CPUは、エミュレータが外部世界と通信するのを補助するために次の"特別な"2バイトオペコードも実装しています。
+              </p><ul>
+	              <li><code>0F 00</code> (<code>PUTCHAR_AL</code>) - <code>AL</code>レジスタの文字を端末に出力する</li>
+	              <li><code>0F 01</code> (<code>GET_RTC</code>) - （<code>localtime</code>が返す）リアルタイムクロックデータを<code>ES:BX</code>が示すメモリ一に書き込む。</li>
+	              <li><code>0F 02</code> (<code>READ_DISK</code>) - ディスクのオフセット<code>512*(16*SI+BP)</code>から<code>AX</code>バイトをメモリロケーション<code>ES:BX</code>に読み込む。ディスクは<code>DL</code>で指定される（0 = ハードディスク, 1 = フロッピーディスク）。</li>
+	              <li><code>0F 03</code> (<code>WRITE_DISK</code>) - メモリロケーション<code>ES:BX</code>の<code>AX</code>バイトをディスクのオフセット<code>512*(16*SI+BP)</code>に書き込む。ディスクは<code>0F 02</code>と同じく<code>DL</code>で指定する。</li>
+                </ul>
+
+              <p>
+								エミュレータの終了は<code>JMP 0:0</code>命令によりトリガすることができ、ユーザが端末をシャットダウンすることなく容易にエミュレータを終了できます。</p>
+              <p>
+								8086tinyがサポートしている命令セットの拡張は、上で説明したBIOSソース内のテーブルを適宜修正し、対応する新しい<code>OPCODE</code>ブロックをCソースに追加することで実現できます。</p>
+            </p>
+        	</div>
+  </div>
+
+      <div class="section_box2" align="justify">
+	        <div class="post_title">サポート済みのアプリケーションソフトウェア</div>
+        	<div class="text_area">
+            <p>
+							エミュレータは（このページの最初にリストしたスペックの）現実のPCが実行できるすべてのソフトウェアを実用的に実行します。
+            </p><p>
+              作者はこのエミュレータで様々なソフトウェアのテストに成功しています。
+              <ul>
+                <li>OS/GUI</li>
+                <ul><li>MS-DOS 6.22</li>
+                  <li>FreeDOS 0.82pl3</li>
+                  <li>Linux/ELKS 0.1.4</li>
+                  <li>Windows 3.0</li>
+                  <li>DESQview 2.8</li>
+                  <li>ETEN Chinese System</li></ul>
+                <li>商品ソフトウェア</li>
+                <ul><li>Lotus 1-2-3 R2.4</li>
+                  <li>AsEasyAs 5.7</li>
+                  <li>Excel 2.1 for Windows</li>
+                  <li>AutoCAD 2.5</li>
+                  <li>WordStar 4</li></ul>
+                <li>プログラミング言語</li>
+                <ul><li>QBASIC</li>
+                  <li>GWBASIC</li>
+                  <li>Turbo C++</li></ul>
+                <li>ゲーム</li>
+                <ul><li>Carrier Command</li>
+                  <li>Police Quest</li>
+                  <li>SimCity</li>
+                  <li>Alley Cat</li>
+                  <li>MS Flight Simulator 4</li>
+                  <li>Lots of freeware Windows games</li></ul>
+                <li>診断/ベンチマークソフトウェア</li>
+                <ul><li>Manifest</li>
+                  <li>Microsoft MSD</li>
+                  <li>InfoSpot</li>
+                  <li>CheckIt</li></ul>
+                </ul>
+            </p>
+        	</div>
+  </div>
+
+</div>
+</div>
+
+    	<div id="templatemo_right_column">
+
+            <ul class="templatemo_menu">
+              <li><a href="http://www.megalith.co.uk/8086tiny/index.html">Home</a></li>
+              <li><a href="http://www.megalith.co.uk/8086tiny/download.html">Download</a></li>
+              <li><a href="http://www.megalith.co.uk/8086tiny/doc.html" style="background:#0066CC; color:#FFFFFF">Documentation</a></li>
+              <li><a href="http://8086tiny.freeforums.net">Blog/Forum</a></li>
+          </ul>
+
+          <div class="section_box" align="justify">
+            <div class="subtitle">Author Contact</div>
+              <b>Adrian Cable</b><br />
+              <a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x61;&#100;&#114;&#x69;&#97;&#110;&#46;&#99;&#97;&#x62;&#x6c;&#x65;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#x61;&#x64;&#x72;&#x69;&#x61;&#110;&#x2e;&#x63;&#97;&#98;&#x6c;&#x65;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#109;</a><br />
+
+            <p>If 8086tiny brings you joy or profit, the author welcomes modest donations as a token of appreciation.</p>
+
+		          <center><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+		          <input type="hidden" name="cmd" value="_s-xclick">
+		          <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----">
+		          <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+		          <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+		          </form></center>
+
+          </div>
+        </div>
+
+	<div id="templatemo_footer">
+    Copyright © 2013-2014 Adrian Cable · CSS template by <a href="http://www.templatemo.com" rel="nofollow" target="_blank">templatemo.com</a>
+    </div>
+
+</div>
+<div class="templatemo_spacer"></div>
+</div>
+
+</body>
+</html>
